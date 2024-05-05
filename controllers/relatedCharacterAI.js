@@ -65,7 +65,19 @@ async function handleChatCommand(message, characterAI) {
 }
 
 async function handleGenImageCommand(message, characterAI) {
+    if (!selectedCharacter) {
+        message.channel.send("Please select a character first using `w!select`.");
+        return;
+    }
+
     const content = message.content.slice("w!genImage".length).trim();
+    
+    // Check if there's any content after the command
+    if (!content) {
+        message.channel.send("Please provide a message after `w!genImage <message>`.");
+        return;
+    }
+
     await withMutex(async () => {
         chat = await characterAI.createOrContinueChat(selectedCharacter.id);
         const imageURL = await chat.generateImage(content);
@@ -82,6 +94,7 @@ async function handleGenImageCommand(message, characterAI) {
         }
     });
 }
+
 
 module.exports = {
     handleListCommand,

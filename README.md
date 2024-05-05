@@ -22,6 +22,7 @@ This Discord bot allows users to interact with various AI characters using text 
 
    - `sessionTokenFromCharacterId`: Session token for authentication with the Character AI service.
    - `discordToken`: Discord bot token.
+   - `constants/listCharacters.js`: Contains the list of characters available for interaction.
 
 4. Run the bot:
 

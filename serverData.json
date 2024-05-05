@@ -1,0 +1,33 @@
+{
+  "chatHistories": {
+    "172128350616289281": [
+      "anj",
+      "I'm sorry, I don't understand what \"anj\" means. Could you please rephrase? \n"
+    ]
+  },
+  "activeUsersInChannels": {},
+  "customInstructions": {},
+  "serverSettings": {
+    "894158641177976862": {
+      "serverChatHistory": false,
+      "settingsSaveButton": true,
+      "customServerPersonality": false,
+      "serverResponsePreference": false,
+      "responseStyle": "embedded"
+    }
+  },
+  "userPreferredImageModel": {
+    "172128350616289281": "Redmond"
+  },
+  "userPreferredImageResolution": {},
+  "userPreferredImagePromptEnhancement": {
+    "172128350616289281": true
+  },
+  "userPreferredSpeechModel": {},
+  "userPreferredUrlHandle": {},
+  "userResponsePreference": {},
+  "alwaysRespondChannels": {},
+  "blacklistedUsers": {
+    "894158641177976862": []
+  }
+}

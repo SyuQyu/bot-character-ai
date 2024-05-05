@@ -1,0 +1,97 @@
+// client.on("messageCreate", async (message) => {
+//   // Check if the message starts with the command prefix
+//   if (message.content.startsWith("w!list")) {
+//     let characterList = "List of characters:\n";
+//     characterId.forEach((character, index) => {
+//       characterList += `${index + 1}. ${character.name}\n`;
+//     });
+//     message.channel.send(characterList);
+//   }
+
+//   if (message.content.startsWith("w!select")) {
+//     if (selectedCharacter !== null) {
+//       selectedCharacter = null;
+//     }
+//     const content = message.content.slice("w!select".length).trim();
+//     selectedCharacter = characterId[content - 1];
+
+//     if (!selectedCharacter) {
+//       message.channel.send(
+//         "Sorry, that character doesn't exist. choose with number \nPlease select a character first using `w!select` command. \nexample `w!select 1`."
+//       );
+//       return; // Stop execution if character doesn't exist
+//     }
+
+//     console.log(selectedCharacter);
+//     if (selectedCharacter) {
+//       const data = await characterAI.fetchCharacterInfo(selectedCharacter.id);
+//       message.channel.send(
+//         `Selected ${selectedCharacter.name} \n` +
+//           "You can now chat with the selected character using `w!chat <message>` command. \n" +
+//           `${selectedCharacter.name}: ` +
+//           data?.greeting
+//       );
+//     }
+//   }
+
+//   // Command to chat with the selected character
+//   if (message.content.startsWith("w!chat")) {
+//     if (selectedCharacter !== null) {
+//       const content = message.content.slice("w!chat".length).trim();
+//       await withMutex(async () => {
+//         chat = await characterAI.createOrContinueChat(selectedCharacter.id);
+//         const response = await chat.sendAndAwaitResponse(content, true);
+//         message.channel.send(`${selectedCharacter.name}: ` + response.text);
+//         if (selectedCharacter?.name === "**RPG Roleplay**") {
+//           const cutTextGen = await cutText(".", response.text);
+//           const imageURL = await chat.generateImage(cutTextGen);
+//           console.log(imageURL);
+//           if (imageURL) {
+//             const embed = new Discord.EmbedBuilder()
+//               .setTitle(cutTextGen)
+//               .setImage(imageURL)
+//               .setColor("#008080")
+//               .setTimestamp();
+//             message.channel.send({ embeds: [embed] });
+//           }
+//         }
+//       });
+//     } else {
+//       message.channel.send(
+//         "Please select a character first using `w!select` command."
+//       );
+//     }
+//   }
+
+//   if (message.content.startsWith("w!genImage")) {
+//     if (!selectedCharacter) {
+//       message.channel.send(
+//         "Please select a character first using `w!select` command."
+//       );
+//       return;
+//     }
+
+//     const content = message.content.slice("w!genImage".length).trim();
+//     await withMutex(async () => {
+//       chat = await characterAI.createOrContinueChat(selectedCharacter.id);
+//       const imageURL = await chat.generateImage(content);
+//       console.log(imageURL);
+//       if (imageURL) {
+//         const embed = new Discord.EmbedBuilder()
+//           .setTitle(content)
+//           .setImage(imageURL)
+//           .setColor("#008080")
+//           .setTimestamp();
+//         message.channel.send({ embeds: [embed] });
+//       } else {
+//         message.channel.send("Failed to generate the image.");
+//       }
+//     });
+//   }
+
+//   if (message.content.startsWith("w!help")) {
+//     message.channel.send(
+//       "Available commands:\n`w!list` - List of characters\n`w!select <number>` - Select a character\n`w!chat <message>` - Chat with the selected character\n`w!genImage <message>` - Generate an image based on the message\n`w!help` - List of available commands"
+//     );
+//   }
+// });

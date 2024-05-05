@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "async-mutex": "^0.5.0",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
     "node_characterai": "^1.2.7",

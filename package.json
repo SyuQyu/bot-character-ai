@@ -1,9 +1,13 @@
 {
+  "scripts": {
+    "start": "concurrently \"node discord.js\" \"node gemini.js\""
+  },
   "dependencies": {
     "@google/generative-ai": "^0.10.0",
     "async-mutex": "^0.5.0",
     "axios": "^1.6.8",
     "cheerio": "^1.0.0-rc.12",
+    "concurrently": "^8.2.2",
     "crypto": "^1.0.1",
     "discord.js": "^14.15.1",
     "dotenv": "^16.4.5",

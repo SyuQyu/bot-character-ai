@@ -3322,10 +3322,10 @@ const nsfwWordsArray = [
 ];
 
 function filterPrompt(text) {
-    // nsfwWordsArray.forEach(word => {
-    //     const regexPattern = new RegExp(word.split('').join('\\W*'), 'gi');
-    //     text = text.replace(regexPattern, '');
-    // });
+    nsfwWordsArray.forEach(word => {
+        const regexPattern = new RegExp(word.split('').join('\\W*'), 'gi');
+        text = text.replace(regexPattern, '');
+    });
     return text;
 }
 

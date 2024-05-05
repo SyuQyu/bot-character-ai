@@ -49,20 +49,25 @@ async function handleChatCommand(message, characterAI) {
         const response = await chat.sendAndAwaitResponse(content, true);
         message.channel.send(`${selectedCharacter.name}: ` + response.text);
         if (selectedCharacter?.name === "**RPG Roleplay**") {
-            const cutTextGen = await cutText(".", response.text);
-            const imageURL = await chat.generateImage(cutTextGen);
-            console.log(imageURL);
-            if (imageURL) {
+            try {
+                const cutTextGen = await cutText(".", response.text);
+                const imageURL = await chat.generateImage(cutTextGen);
+                console.log(imageURL);
                 const embed = new Discord.EmbedBuilder()
                     .setTitle(cutTextGen)
                     .setImage(imageURL)
                     .setColor("#008080")
                     .setTimestamp();
                 message.channel.send({ embeds: [embed] });
+            } catch (error) {
+                console.error("Error generating image:", error);
+                message.channel.send(`Image not successfully generated: ` + error);
+                // Log the error and handle it accordingly, e.g., notify the user or take other actions.
             }
         }
     });
 }
+
 
 async function handleGenImageCommand(message, characterAI) {
     if (!selectedCharacter) {
@@ -71,7 +76,7 @@ async function handleGenImageCommand(message, characterAI) {
     }
 
     const content = message.content.slice("w!genImage".length).trim();
-    
+
     // Check if there's any content after the command
     if (!content) {
         message.channel.send("Please provide a message after `w!genImage <message>`.");
@@ -80,17 +85,19 @@ async function handleGenImageCommand(message, characterAI) {
 
     await withMutex(async () => {
         chat = await characterAI.createOrContinueChat(selectedCharacter.id);
-        const imageURL = await chat.generateImage(content);
-        console.log(imageURL);
-        if (imageURL) {
+        try {
+            const imageURL = await chat.generateImage(content);
+            console.log(imageURL);
             const embed = new Discord.EmbedBuilder()
                 .setTitle(content)
                 .setImage(imageURL)
                 .setColor("#008080")
                 .setTimestamp();
             message.channel.send({ embeds: [embed] });
-        } else {
-            message.channel.send("Failed to generate the image.");
+        } catch (error) {
+            console.error("Error generating image:", error);
+            message.channel.send(`Image not successfully generated: ` + error);
+            // Log the error and handle it accordingly, e.g., notify the user or take other actions.
         }
     });
 }

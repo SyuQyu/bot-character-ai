@@ -43,6 +43,10 @@ const characterId = [
         name: "**RPG Roleplay**",
         id: "FKArATeiEf0I9fxOIAwUOW3KTlm8yjW-eflbHMCqyBE",
     },
+    {
+        name: "**Programmer**",
+        id: "qtEICpGfFS8f5Zr5kCHR1EsGsHlawNutYSZJq_IEZDY",
+    }
 ];
 
 module.exports = characterId;

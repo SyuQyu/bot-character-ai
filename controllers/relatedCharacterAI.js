@@ -43,6 +43,10 @@ async function handleSelectCommand(
 }
 
 async function handleChatCommand(message, characterAI) {
+    if(selectedCharacter === null) {
+        message.channel.send("Please select a character first using `w!select`.");
+        return;
+    }
     const content = message.content.slice("w!chat".length).trim();
     await withMutex(async () => {
         chat = await characterAI.createOrContinueChat(selectedCharacter.id);

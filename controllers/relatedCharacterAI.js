@@ -1,33 +1,73 @@
 const Discord = require("discord.js");
 const { withMutex } = require("../utils/mutex");
 const { cutText } = require("../utils/cutText");
-const characterId = require('../constants/listCharacters');
-
+const { getAllCharactersController, createCharacterController, getCharacterByIdController } = require("../database/controllers/character.controllers")
 let selectedCharacter = null;
+
+async function sendPleaseWaitMessage(message) {
+    // Send the "please wait" message
+    const waitMessage = await message.channel.send("Please wait...");
+
+    // Return a function to remove the message once processing is complete
+    return () => waitMessage.delete();
+}
 
 async function handleListCommand(message) {
     try {
+        const removeWaitMessage = await sendPleaseWaitMessage(message);
+
         let characterList = "List of characters:\n";
-        characterId.forEach((character, index) => {
-            characterList += `${index + 1}. ${character.name}\n`;
+        const characters = await getAllCharactersController();
+        characters.forEach((character, index) => {
+            characterList += `${index}. **${character.name_characters}**\n`;
         });
         message.channel.send(characterList);
+
+        await removeWaitMessage();
     } catch (error) {
-        console.error("Error handling list command:", error);
-        message.channel.send("An error occurred while handling the list command.");
+        console.error("Error occurred while listing characters:", error);
+        message.channel.send("An error occurred while listing characters. Please try again later.");
     }
 }
 
-async function handleSelectCommand(
-    message,
-    characterAI
-) {
+async function handleAddCommand(message) {
     try {
+        const removeWaitMessage = await sendPleaseWaitMessage(message);
+
+        try {
+            const content = message.content.slice("w!add".length).trim();
+            const [characterId, ...characterNameParts] = content.split(/\s+/); // Split content by whitespace
+            const characterIdTrimmed = characterId?.trim();
+            const characterNameTrimmed = characterNameParts.join(' ').trim(); // Join remaining parts to form the name
+
+            if (!characterIdTrimmed || !characterNameTrimmed) {
+                message.channel.send("Invalid command format. Please use `w!add <id> <name>`.");
+                return;
+            }
+
+            const characterDataAdded = await createCharacterController(characterIdTrimmed, characterNameTrimmed);
+            message.channel.send(`Character **${characterNameTrimmed}** added with ID: ${characterDataAdded.id_characters}`);
+        } catch (error) {
+            console.error("Error occurred while adding character:", error);
+            message.channel.send("An error occurred while adding the character. Please try again later.");
+        }
+
+        await removeWaitMessage();
+    } catch (error) {
+        console.error("Error occurred while handling add command:", error);
+        message.channel.send("An error occurred while handling the add command. Please try again later.");
+    }
+}
+
+async function handleSelectCommand(message, characterAI) {
+    try {
+        const removeWaitMessage = await sendPleaseWaitMessage(message);
+
         if (selectedCharacter !== null) {
             selectedCharacter = null;
         }
         const content = message.content.slice("w!select".length).trim();
-        selectedCharacter = characterId[content - 1];
+        selectedCharacter = await getCharacterByIdController(content);
 
         if (!selectedCharacter) {
             message.channel.send(
@@ -38,31 +78,31 @@ async function handleSelectCommand(
 
         console.log(selectedCharacter);
         if (selectedCharacter) {
-            const data = await characterAI.fetchCharacterInfo(selectedCharacter.id);
+            const data = await characterAI.fetchCharacterInfo(selectedCharacter.id_characters);
             message.channel.send(
-                `Selected ${selectedCharacter.name} \n` +
+                `Selected **${selectedCharacter.name_characters}** \n` +
                 "You can now chat with the selected character using `w!chat <message>` command. \n" +
-                `${selectedCharacter.name}: ` +
+                `**${selectedCharacter.name_characters}**: ` +
                 data?.greeting
             );
         }
+
+        await removeWaitMessage();
     } catch (error) {
-        console.error("Error handling select command:", error);
-        message.channel.send("An error occurred while handling the select command.");
+        console.error("Error occurred while handling select command:", error);
+        message.channel.send("An error occurred while handling the select command. Please try again later.");
     }
 }
 
 async function handleChatCommand(message, characterAI) {
     try {
-        if(selectedCharacter === null) {
-            message.channel.send("Please select a character first using `w!select`.");
-            return;
-        }
+        const removeWaitMessage = await sendPleaseWaitMessage(message);
+
         const content = message.content.slice("w!chat".length).trim();
         await withMutex(async () => {
             chat = await characterAI.createOrContinueChat(selectedCharacter.id);
             const response = await chat.sendAndAwaitResponse(content, true);
-            message.channel.send(`${selectedCharacter.name}: ` + response.text);
+            message.channel.send(`**${selectedCharacter.name}**: ` + response.text);
             if (selectedCharacter?.name === "**RPG Roleplay**") {
                 try {
                     const cutTextGen = await cutText(".", response.text);
@@ -81,14 +121,18 @@ async function handleChatCommand(message, characterAI) {
                 }
             }
         });
+
+        await removeWaitMessage();
     } catch (error) {
-        console.error("Error handling chat command:", error);
-        message.channel.send("An error occurred while handling the chat command.");
+        console.error("Error occurred while handling chat command:", error);
+        message.channel.send("An error occurred while handling the chat command. Please try again later.");
     }
 }
 
 async function handleGenImageCommand(message, characterAI) {
     try {
+        const removeWaitMessage = await sendPleaseWaitMessage(message);
+
         if (!selectedCharacter) {
             message.channel.send("Please select a character first using `w!select`.");
             return;
@@ -119,15 +163,19 @@ async function handleGenImageCommand(message, characterAI) {
                 // Log the error and handle it accordingly, e.g., notify the user or take other actions.
             }
         });
+
+        await removeWaitMessage();
     } catch (error) {
-        console.error("Error handling genImage command:", error);
-        message.channel.send("An error occurred while handling the genImage command.");
+        console.error("Error occurred while handling genImage command:", error);
+        message.channel.send("An error occurred while handling the genImage command. Please try again later.");
     }
 }
+
 
 module.exports = {
     handleListCommand,
     handleSelectCommand,
     handleChatCommand,
     handleGenImageCommand,
+    handleAddCommand
 };

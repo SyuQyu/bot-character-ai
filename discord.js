@@ -3,7 +3,8 @@ const CharacterAI = require("node_characterai");
 const { handleListCommand,
   handleSelectCommand,
   handleChatCommand,
-  handleGenImageCommand
+  handleGenImageCommand,
+  handleAddCommand
 } = require("./controllers/relatedCharacterAI");
 const { chatBotAI,
   genImageBotAI
@@ -37,6 +38,8 @@ client.on("messageCreate", async (message) => {
     await handleListCommand(message);
   } else if (message.content.startsWith("w!select")) {
     await handleSelectCommand(message, characterAI);
+  } else if (message.content.startsWith("w!add")) {
+    await handleAddCommand(message);
   } else if (message.content.startsWith("w!chat")) {
     await handleChatCommand(message, characterAI);
   } else if (message.content.startsWith("w!genImage")) {
@@ -54,7 +57,7 @@ client.on("messageCreate", async (message) => {
 async function handleHelpCommand(message) {
   message.channel.send(
     "Available commands:\n`w!list` - List of characters\n`w!select <number>` - Select a character\n`w!chat <message>` - Chat with the selected character\n`w!genImage <message>` - Generate an image based on the message\n`gpt!chat <message>` - Chat with the AI\n`gpt!genImage <message>` - Generate an image based on the message\n`w!gemini` - Talk with Gemini AI\n`w!help` - List of available commands\n\nUse slash commands (/) to see another feature"
-  );   
+  );
 }
 
 

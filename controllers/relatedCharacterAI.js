@@ -96,7 +96,7 @@ async function handleChatCommand(message, characterAI) {
 
     const content = message.content.slice("w!chat".length).trim();
     await withMutex(async () => {
-        chat = await characterAI.createOrContinueChat(selectedCharacter.id);
+        chat = await characterAI.createOrContinueChat(selectedCharacter.id_characters);
         const response = await chat.sendAndAwaitResponse(content, true);
         message.channel.send(`**${selectedCharacter.name}**: ` + response.text);
         if (selectedCharacter?.name === "**RPG Roleplay**") {
@@ -140,7 +140,7 @@ async function handleGenImageCommand(message, characterAI) {
     }
 
     await withMutex(async () => {
-        chat = await characterAI.createOrContinueChat(selectedCharacter.id);
+        chat = await characterAI.createOrContinueChat(selectedCharacter.id_characters);
         try {
             const imageURL = await chat.generateImage(content);
             console.log(imageURL);

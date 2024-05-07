@@ -46,6 +46,10 @@ const characterId = [
     {
         name: "Programmer",
         id: "qtEICpGfFS8f5Zr5kCHR1EsGsHlawNutYSZJq_IEZDY",
+    },
+    {
+        name: "**Asuka Langley**",
+        id: "FSLQDzZILkc9rc6nSS7Fjpp9X073M-xZDU3Qxp_XSIo",
     }
 ];
 

@@ -40,6 +40,7 @@ async function handleAddCommand(message) {
 
         if (!characterIdTrimmed || !characterNameTrimmed) {
             message.channel.send("Invalid command format. Please use `w!add <id> <name>`.");
+            await removeWaitMessage();
             return;
         }
 
@@ -48,6 +49,7 @@ async function handleAddCommand(message) {
     } catch (error) {
         console.error("Error occurred while adding character:", error);
         message.channel.send("An error occurred while adding the character. Please try again later.");
+        await removeWaitMessage();
     }
 
     // Remove the "please wait" message after processing
@@ -72,6 +74,7 @@ async function handleSelectCommand(
         message.channel.send(
             "Sorry, that character doesn't exist. choose with number \nPlease select a character first using `w!select` command. \nexample `w!select 1`."
         );
+        await removeWaitMessage();
         return; // Stop execution if character doesn't exist
     }
 
@@ -94,7 +97,19 @@ async function handleChatCommand(message, characterAI) {
     // Send "please wait" message and get a function to remove it
     const removeWaitMessage = await sendPleaseWaitMessage(message);
 
+    if (!selectedCharacter) {
+        message.channel.send("Please select a character first using `w!select`.");
+        await removeWaitMessage();
+        return;
+    }
     const content = message.content.slice("w!chat".length).trim();
+
+    if (!content) {
+        message.channel.send("Please provide a message after `w!chat <message>`.");
+        await removeWaitMessage();
+        return;
+    }
+
     await withMutex(async () => {
         chat = await characterAI.createOrContinueChat(selectedCharacter.id_characters);
         const response = await chat.sendAndAwaitResponse(content, true);
@@ -113,6 +128,7 @@ async function handleChatCommand(message, characterAI) {
             } catch (error) {
                 console.error("Error generating image:", error);
                 message.channel.send(`Image not successfully generated: ` + error);
+                await removeWaitMessage();
                 // Log the error and handle it accordingly, e.g., notify the user or take other actions.
             }
         }
@@ -128,6 +144,7 @@ async function handleGenImageCommand(message, characterAI) {
 
     if (!selectedCharacter) {
         message.channel.send("Please select a character first using `w!select`.");
+        await removeWaitMessage();
         return;
     }
 
@@ -136,6 +153,7 @@ async function handleGenImageCommand(message, characterAI) {
     // Check if there's any content after the command
     if (!content) {
         message.channel.send("Please provide a message after `w!genImage <message>`.");
+        await removeWaitMessage();
         return;
     }
 
@@ -153,6 +171,7 @@ async function handleGenImageCommand(message, characterAI) {
         } catch (error) {
             console.error("Error generating image:", error);
             message.channel.send(`Image not successfully generated: ` + error);
+            await removeWaitMessage();
             // Log the error and handle it accordingly, e.g., notify the user or take other actions.
         }
     });

@@ -161,6 +161,7 @@ async function handleGenImageCommand(message, characterAI) {
     await removeWaitMessage();
 }
 
+
 module.exports = {
     handleListCommand,
     handleSelectCommand,

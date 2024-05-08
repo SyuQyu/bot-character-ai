@@ -112,27 +112,33 @@ async function handleChatCommand(message, characterAI) {
 
     await withMutex(async () => {
         chat = await characterAI.createOrContinueChat(selectedCharacter.id_characters);
-        const response = await chat.sendAndAwaitResponse(content, true);
-        message.channel.send(`**${selectedCharacter.name_characters}**: ` + response.text);
-        if (selectedCharacter?.name_characters === "**RPG Roleplay**") {
-            try {
-                const cutTextGen = await cutText(".", response.text);
-                const imageURL = await chat.generateImage(cutTextGen);
-                console.log(imageURL);
-                const embed = new Discord.EmbedBuilder()
-                    .setTitle(cutTextGen)
-                    .setImage(imageURL)
-                    .setColor("#008080")
-                    .setTimestamp();
-                message.channel.send({ embeds: [embed] });
-            } catch (error) {
-                console.error("Error generating image:", error);
-                message.channel.send(`Image not successfully generated: ` + error);
-                await removeWaitMessage();
-                // Log the error and handle it accordingly, e.g., notify the user or take other actions.
+        try {
+            const response = await chat.sendAndAwaitResponse(content, true);
+            message.channel.send(`**${selectedCharacter.name_characters}**: ` + response.text);
+            if (selectedCharacter?.name_characters === "**RPG Roleplay**") {
+                try {
+                    const cutTextGen = await cutText(".", response.text);
+                    const imageURL = await chat.generateImage(cutTextGen);
+                    console.log(imageURL);
+                    const embed = new Discord.EmbedBuilder()
+                        .setTitle(cutTextGen)
+                        .setImage(imageURL)
+                        .setColor("#008080")
+                        .setTimestamp();
+                    message.channel.send({ embeds: [embed] });
+                } catch (error) {
+                    console.error("Error generating image:", error);
+                    message.channel.send(`Image not successfully generated: ` + error);
+                    await removeWaitMessage();
+                    // Log the error and handle it accordingly, e.g., notify the user or take other actions.
+                }
             }
+        } catch (error) {
+            console.error("Error sending and awaiting response:", error);
+            // Handle the error, e.g., notify the user or take other actions.
         }
     });
+
 
     // Remove the "please wait" message after processing
     await removeWaitMessage();

@@ -67,31 +67,40 @@ async function handleSelectCommand(
         selectedCharacter = null;
     }
     const content = message.content.slice("w!select".length).trim();
-    selectedCharacter = await getCharacterByIdController(content);
-    // selectedCharacter = characterId[content - 1];
 
-    if (!selectedCharacter) {
-        message.channel.send(
-            "Sorry, that character doesn't exist. choose with number \nPlease select a character first using `w!select` command. \nexample `w!select 1`."
-        );
-        await removeWaitMessage();
-        return; // Stop execution if character doesn't exist
-    }
+    try {
+        selectedCharacter = await getCharacterByIdController(content);
 
-    console.log(selectedCharacter);
-    if (selectedCharacter) {
-        const data = await characterAI.fetchCharacterInfo(selectedCharacter.id_characters);
+        if (!selectedCharacter) {
+            message.channel.send(
+                "Sorry, that character doesn't exist. choose with number \nPlease select a character first using `w!select` command. \nexample `w!select 1`."
+            );
+            await removeWaitMessage();
+            return; // Stop execution if character doesn't exist
+        }
+
+        console.log(selectedCharacter);
+        if (selectedCharacter) {
+            const data = await characterAI.fetchCharacterInfo(selectedCharacter.id_characters);
+            message.channel.send(
+                `Selected **${selectedCharacter.name_characters}** \n` +
+                "You can now chat with the selected character using `w!chat <message>` command. \n" +
+                `**${selectedCharacter.name_characters}**: ` +
+                data?.greeting
+            );
+        }
+
+    } catch (error) {
+        console.error("Error fetching character by ID:", error);
         message.channel.send(
-            `Selected **${selectedCharacter.name_characters}** \n` +
-            "You can now chat with the selected character using `w!chat <message>` command. \n" +
-            `**${selectedCharacter.name_characters}**: ` +
-            data?.greeting
+            "An error occurred while trying to select the character.\nPlease try selecting character from list `w!list` and select using number with command `w!select <message>`."
         );
     }
 
     // Remove the "please wait" message after processing
     await removeWaitMessage();
 }
+
 
 async function handleChatCommand(message, characterAI) {
     // Send "please wait" message and get a function to remove it
